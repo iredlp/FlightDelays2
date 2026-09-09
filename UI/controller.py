@@ -96,7 +96,25 @@ class Controller:
 
 
     def handleCerca(self,e):
-        pass
+        t=self._view._txtInNTratteMax.value
+
+        try:
+            tInt=int(t)
+        except ValueError:
+            self._view._txtResults.controls.clear()
+            self._view._txtResults.controls.append(
+                ft.Text(f"Il valore di t deve essere un intero positivo", color="green"))
+
+
+        path, score=self._model.getCamminoOttimo(self._choiceDDPartenza, self._choiceDDArrivo,tInt)
+        self._view._txtResults.controls.clear()
+        self._view._txtResults.controls.append(
+            ft.Text(f"Il valore ha uno score complessivo pari a {score} e contiene i seguenti nodi:", color="green"))
+        for p in path:
+            self._view._txtResults.controls.append(ft.Text(f"{p}", color="green"))
+        self._view.update_page()
+
+
 
     def fillDropdown(self,allNodes):
         for n in allNodes:

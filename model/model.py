@@ -1,3 +1,5 @@
+import copy
+
 import networkx as nx
 
 from database.DAO import DAO
@@ -10,6 +12,42 @@ class Model:
         self._idMapAirports={}
         for a in self._airports:
             self._idMapAirports[a.ID] = a
+        self._bestCammino = []
+        self._bestScore = 0
+
+    def getCamminoOttimo(self, v0, v1,t):
+        self._bestCammino=[]
+        self._bestScore=0
+        #soluzione parziale
+        parziale=[v0]
+        self._ricorsione(parziale,v1,t)
+        return self._bestCammino, self._bestScore
+
+    def _ricorsione(self, parziale, v1,t):
+        #verifico se parziale è una soluzione valida ed in caso la salvo
+        if parziale[-1]==v1: #potenzialmente questa è una soluz accettabile
+            if self._getScore(parziale)>self._bestScore:
+                #aggiorno le variabili di classe
+                self._bestCammino = copy.deepcopy(parziale)
+                self._bestScore = self._getScore(parziale)
+
+        #verifico se ha senso continuare ad aggiungere elementi in parziale, oppure esco
+        if len(parziale)==t+1: #allora parziale ha già raggiunto il num max di tratte e INTERROMPO
+            return
+        #espando parziale e faccio la ricorsione con backtracking
+        for n in self._graph.neighbors(parziale[-1]):
+            if n not in parziale:
+                parziale.append(n)
+                self._ricorsione(parziale, v1,t)
+                parziale.pop()
+
+
+    def _getScore(self, parziale):
+        #deve sommare i pesi degli archi
+        sumPesi=0
+        for i in range(0,len(parziale)-1):
+            sumPesi+=self._graph[parziale[i]][parziale[i+1]]['weight']
+        return sumPesi
 
     def buildGraph(self, nMin):
         nodes=DAO.getAllNodes(nMin, self._idMapAirports)
