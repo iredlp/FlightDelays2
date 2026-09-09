@@ -80,6 +80,8 @@ class Model:
 
         #4)
         path=nx.dijkstra_path(self._graph,v0,v1, weight=None)
+       # 5)
+        #path = nx.dijkstra_path(self._graph, v0, v1) #così avro cammini più lunghi
         return path
 
 
